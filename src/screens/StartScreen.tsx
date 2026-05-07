@@ -1,30 +1,32 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
   FlatList,
-  useWindowDimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  SafeAreaView,
   StyleProp,
-  ViewStyle,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  type ViewStyle,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing, tokens } from '../theme';
+import LevelButton from '../components/ui/LevelButton';
 
 type Level = {
-  id: string;
+  id: 'park' | 'beach' | 'city';
   name: string;
   backgroundStyle: StyleProp<ViewStyle>;
 };
 
 const copy = {
   start: 'STARTA',
-  highScoreLabel: 'HÖGSTA POÄNG',
+  highScoreLabel: 'HOGSTA POANG',
   info: 'Information',
-  settings: 'Inställningar',
+  settings: 'Installningar',
   levels: {
     park: 'PARK',
     beach: 'STRAND',
@@ -68,17 +70,14 @@ const StartScreen = () => {
   );
 
   const handleStartPress = (): void => {
-    // TODO: logik för att starta spelet här
     console.log('Start game');
   };
 
   const handleInfoPress = (): void => {
-    // TODO: navigera till infosida
     console.log('Info pressed');
   };
 
   const handleSettingsPress = (): void => {
-    // TODO: navigera till settingssida
     console.log('Settings pressed');
   };
 
@@ -122,7 +121,7 @@ const StartScreen = () => {
 
           <View style={styles.highScoreContainer}>
             <Text style={styles.highScoreLabel}>{copy.highScoreLabel}</Text>
-            <Text style={styles.highScoreValue}>🏆 1280</Text>
+            <Text style={styles.highScoreValue}>1280</Text>
           </View>
 
           <TouchableOpacity
@@ -149,13 +148,12 @@ const StartScreen = () => {
         </View>
 
         <View style={styles.bottomContainer} pointerEvents="auto">
-          <TouchableOpacity
-            style={styles.startButton}
-            activeOpacity={0.85}
+          <LevelButton
+            label={copy.start}
+            level={levels[activeIndex].id}
             onPress={handleStartPress}
-          >
-            <Text style={styles.startButtonText}>{copy.start}</Text>
-          </TouchableOpacity>
+            style={styles.startButton}
+          />
         </View>
       </SafeAreaView>
     </View>
@@ -171,27 +169,27 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cityBackground: {
-    backgroundColor: '#3D8BFF',
+    backgroundColor: tokens.cityPrimary,
   },
   beachBackground: {
-    backgroundColor: '#FFB347',
+    backgroundColor: tokens.beachPrimary,
   },
   parkBackground: {
-    backgroundColor: '#6CBF3F',
+    backgroundColor: colors.success,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     flex: 1,
-    paddingHorizontal: 22,
-    paddingBottom: 22,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingVertical: spacing.sm,
   },
   iconButton: {
     width: 48,
@@ -207,16 +205,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   highScoreLabel: {
-    color: 'white',
+    color: colors.textPrimary,
     fontSize: 12,
     fontWeight: '700',
     letterSpacing: 1,
   },
   highScoreValue: {
-    color: 'white',
+    color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '700',
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
   centerContent: {
     flex: 1,
@@ -226,7 +224,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 72,
     fontWeight: '700',
-    color: 'white',
+    color: colors.textPrimary,
     letterSpacing: 4,
   },
   paginationContainer: {
@@ -243,29 +241,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
   },
   activeDot: {
-    backgroundColor: 'white',
+    backgroundColor: colors.textPrimary,
     width: 12,
     height: 12,
     borderRadius: 6,
   },
   bottomContainer: {
-    paddingBottom: 6,
+    paddingBottom: spacing.xs,
   },
   startButton: {
-    backgroundColor: '#5AB82E',
-    height: 64,
-    borderRadius: 14,
-    borderWidth: 3,
-    borderColor: '#2A5C14',
-    marginHorizontal: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  startButtonText: {
-    color: 'white',
-    fontSize: 28,
-    fontWeight: '700',
-    letterSpacing: 2,
+    marginHorizontal: spacing.lg,
   },
 });
 
