@@ -1,0 +1,72 @@
+:root {
+  /* Brand */
+  --color-primary: #FFD44D;
+  --color-primary-dark: #E0B300;
+
+  /* Text */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E6E6E6;
+  --color-text-muted: #9CA3AF;
+  --color-text-dark: #102363;
+
+  /* Backgrounds */
+  --color-bg-dark: #0B1730;
+  --color-bg-overlay: rgba(0, 0, 0, 0.45);
+
+  /* Surfaces */
+  --color-surface: #1F2937;
+  --color-surface-light: #374151;
+  --color-surface-border: #4B5563;
+
+  /* States */
+  --color-success: #6BCB3D;
+  --color-error: #F04D3A;
+  --color-warning: #FF9F1C;
+
+  /* Shadows */
+  --shadow-dark: #09101F;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+:root {
+  /* City theme */
+  --city-primary: #3D8BFF;
+  --city-secondary: #2B6FD1;
+  --city-accent: #6CB4FF;
+
+  --city-surface: #102363;
+  --city-surface-light: #1E4B8F;
+
+  --city-button: #3D8BFF;
+  --city-button-hover: #62A4FF;
+
+  --city-progress-bg: #18335E;
+  --city-progress-fill: #6BCB3D;
+}
+
+:root {
+  /* Beach theme */
+  --beach-primary: #FFB347;
+  --beach-secondary: #F08A24;
+  --beach-accent: #FFD98C;
+
+  --beach-surface: #8B4513;
+  --beach-surface-light: #CE6B1A;
+
+  --beach-button: #FF9F1C;
+  --beach-button-hover: #FFB347;
+
+  --beach-progress-bg: #9C5A1A;
+  --beach-progress-fill: #5BC0EB;
+}
