@@ -5,12 +5,8 @@ import { useOnboarding } from './src/hooks/useOnboarding';
 import StartScreen from './src/screens/StartScreen';
 
 export default function App() {
-  const {
-    showOnboarding,
-    completeOnboarding,
-    closeOnboarding,
-    isLoading,
-  } = useOnboarding();
+  const { showOnboarding, completeOnboarding, closeOnboarding, isLoading } =
+    useOnboarding();
 
   if (isLoading) {
     return <View style={styles.container} />;
