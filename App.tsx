@@ -1,42 +1,60 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import OnboardingModal from './src/components/OnboardingModal';
+import StartScreen from './src/screens/StartScreen';
 
-const ONBOARDING_KEY = 'onboardingCompleted';
+const ONBOARDING_KEY = '@onboarding_completed';
 
 export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkOnboarding = async () => {
-      const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
+    let isMounted = true;
 
-      if (completed !== 'true') {
-        setShowOnboarding(true);
+    const checkOnboarding = async () => {
+      try {
+        const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
+
+        if (isMounted) {
+          setShowOnboarding(completed !== 'true');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkOnboarding();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const resetOnboarding = async () => {
-    await AsyncStorage.removeItem(ONBOARDING_KEY);
-    setShowOnboarding(true);
+  const handleOnboardingComplete = async () => {
+    await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
   };
+
+  if (isLoading) {
+    return <View style={styles.container} />;
+  }
+
+  if (showOnboarding) {
+    return (
+      <OnboardingModal
+        visible={showOnboarding}
+        onClose={handleOnboardingComplete}
+      />
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mitt spel</Text>
-
-      <Pressable style={styles.resetButton} onPress={resetOnboarding}>
-        <Text style={styles.resetButtonText}>Visa onboarding igen</Text>
-      </Pressable>
-
-      <OnboardingModal
-        visible={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-      />
+      <StartScreen />
     </View>
   );
 }
@@ -44,23 +62,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  resetButton: {
-    marginTop: 20,
-    backgroundColor: '#ddd',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-  },
-  resetButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#222',
   },
 });
