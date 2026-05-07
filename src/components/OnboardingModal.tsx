@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors } from '../theme';
 
 const ONBOARDING_KEY = 'onboardingCompleted';
 
@@ -101,7 +102,7 @@ export default function OnboardingModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: colors.bgDark,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
