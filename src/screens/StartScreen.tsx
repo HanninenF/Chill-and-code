@@ -54,7 +54,7 @@ const StartScreen = () => {
         backgroundStyle: styles.cityBackground,
       },
     ],
-    []
+    [],
   );
 
   const dynamicStyles = useMemo(
@@ -64,7 +64,7 @@ const StartScreen = () => {
           width,
         },
       }),
-    [width]
+    [width],
   );
 
   const handleStartPress = (): void => {
@@ -83,7 +83,7 @@ const StartScreen = () => {
   };
 
   const handleMomentumEnd = (
-    event: NativeSyntheticEvent<NativeScrollEvent>
+    event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
     const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
     setActiveIndex(nextIndex);
@@ -100,7 +100,11 @@ const StartScreen = () => {
         onMomentumScrollEnd={handleMomentumEnd}
         renderItem={({ item }) => (
           <View
-            style={[styles.slide, dynamicStyles.slideWidth, item.backgroundStyle]}
+            style={[
+              styles.slide,
+              dynamicStyles.slideWidth,
+              item.backgroundStyle,
+            ]}
           />
         )}
       />
