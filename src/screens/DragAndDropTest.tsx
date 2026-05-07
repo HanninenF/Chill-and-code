@@ -2,8 +2,10 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
 import Animated, {
   Easing,
+  cancelAnimation,
   interpolate,
   runOnJS,
+  runOnUI,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -73,6 +75,38 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
   const missedRef = useRef(false);
   const swayAmplitude = useRef(12 + Math.random() * 10).current;
 
+  const handleDragStart = () => {
+    runOnUI(() => {
+      'worklet';
+      cancelAnimation(progress);
+    })();
+  };
+
+  const handleDragEnd = () => {
+    const currentProgress = progress.value;
+    const remainingDuration = Math.max(
+      200,
+      (1 - currentProgress) * ANIMATION_DURATION,
+    );
+
+    runOnUI(() => {
+      'worklet';
+      progress.value = withTiming(
+        1,
+        {
+          duration: remainingDuration,
+          easing: Easing.out(Easing.quad),
+        },
+        (finished) => {
+          if (finished && !missedRef.current) {
+            runOnJS(onMissed)();
+            missedRef.current = true;
+          }
+        },
+      );
+    })();
+  };
+
   useEffect(() => {
     missedRef.current = false;
     progress.value = 0;
@@ -122,7 +156,11 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
 
   return (
     <Animated.View style={[styles.wrapper, animatedStyle]}>
-      <Draggable data={item}>
+      <Draggable
+        data={item}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
         <View style={styles.card}>
           {item.image ? (
             <Image source={item.image} style={styles.assetImage} />
@@ -143,6 +181,7 @@ export default function DragAndDropTest() {
   const [message, setMessage] = useState('');
   const [score, setScore] = useState(0);
   const [missed, setMissed] = useState(false);
+  const [isDropped, setIsDropped] = useState(false);
 
   const currentItem = useMemo(
     () => draggableData[currentIndex],
@@ -150,6 +189,8 @@ export default function DragAndDropTest() {
   );
 
   const handleDrop = (category: string, item: any) => {
+    setIsDropped(true);
+
     if (category === item.category) {
       setScore((s) => s + 1);
       setMessage('✅ Correct!');
@@ -161,6 +202,7 @@ export default function DragAndDropTest() {
       setCurrentIndex((i) => i + 1);
       setMessage('');
       setMissed(false);
+      setIsDropped(false);
     }, 500);
   };
 
@@ -183,7 +225,7 @@ export default function DragAndDropTest() {
           {message ? <Text style={styles.message}>{message}</Text> : null}
 
           {/* ITEM */}
-          {currentItem && !missed && (
+          {currentItem && !missed && !isDropped && (
             <AnimatedItem
               item={currentItem}
               onDrop={handleDrop}
@@ -195,7 +237,7 @@ export default function DragAndDropTest() {
           <View style={styles.row}>
             {categories.map((c) => (
               <Droppable
-                key={c.name}
+                key={`${c.name}-${currentIndex}`}
                 onDrop={(data) => handleDrop(c.name, data)}
               >
                 <View style={[styles.zone, { backgroundColor: c.background }]}>
