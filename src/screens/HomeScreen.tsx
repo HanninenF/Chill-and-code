@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
+import DragAndDropTest from './DragAndDropTest';
 
 export function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Chilld and Code</Text>
+      <Text style={styles.title}>Chill and Code</Text>
       <Text style={styles.subtitle}>Expo + React Native game foundation</Text>
+      <DragAndDropTest />
     </View>
   );
 }
