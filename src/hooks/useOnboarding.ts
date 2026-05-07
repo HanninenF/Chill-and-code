@@ -1,21 +1,34 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
-const ONBOARDING_KEY = 'onboardingCompleted';
+const ONBOARDING_KEY = '@onboarding_completed';
 
 export function useOnboarding() {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkOnboarding = async () => {
-      const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
+    let isMounted = true;
 
-      if (completed !== 'true') {
-        setShowOnboarding(true);
+    const checkOnboarding = async () => {
+      try {
+        const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
+
+        if (isMounted) {
+          setShowOnboarding(completed !== 'true');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkOnboarding();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const completeOnboarding = async () => {
@@ -34,6 +47,7 @@ export function useOnboarding() {
 
   return {
     showOnboarding,
+    isLoading,
     completeOnboarding,
     resetOnboarding,
     closeOnboarding,
