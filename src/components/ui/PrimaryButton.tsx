@@ -3,8 +3,10 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  View,
   type PressableProps,
   type StyleProp,
+  type TextStyle,
   type ViewStyle,
 } from 'react-native';
 import {
@@ -19,18 +21,31 @@ import {
 } from '../../theme';
 
 type PrimaryButtonProps = PressableProps & {
-  label: string;
+  label?: string;
   style?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
+  leftIcon?: React.ReactNode;
 };
 
 export default function PrimaryButton({
-  label,
+  label = '',
   style,
+  labelStyle,
+  contentStyle,
+  leftIcon,
   ...pressableProps
 }: PrimaryButtonProps) {
+  const hasLabel = label.trim().length > 0;
+
   return (
     <Pressable style={[styles.button, style]} {...pressableProps}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={[styles.content, contentStyle]}>
+        {leftIcon ? <View style={styles.icon}>{leftIcon}</View> : null}
+        {hasLabel ? (
+          <Text style={[styles.label, labelStyle]}>{label}</Text>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -54,6 +69,16 @@ const styles = StyleSheet.create({
       height: 5,
     },
     elevation: elevation.md,
+  },
+  content: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  icon: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   label: {
     color: colors.textDark,

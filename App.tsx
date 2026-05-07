@@ -1,8 +1,14 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import OnboardingModal from './src/components/OnboardingModal';
 import { useOnboarding } from './src/hooks/useOnboarding';
+import SettingsScreen from './src/screens/SettingsScreen';
 import StartScreen from './src/screens/StartScreen';
+import type { RootStackParamList } from './src/navigation/types';
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const { showOnboarding, completeOnboarding, closeOnboarding, isLoading } =
@@ -14,7 +20,17 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {!showOnboarding && <StartScreen />}
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="Start" component={StartScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
 
       <OnboardingModal
         visible={showOnboarding}
