@@ -11,6 +11,7 @@ import {
   tokens,
   zIndex,
 } from '../theme';
+import { FONTS } from '../theme/fonts';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -59,6 +60,7 @@ const styles = StyleSheet.create({
     fontSize: tokens.fontSize3xl,
     lineHeight: tokens.lineHeight2xl,
     fontWeight: tokens.fontWeightLight,
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   illustration: {
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
     fontSize: tokens.fontSize5xl,
     lineHeight: tokens.lineHeight5xl,
     fontWeight: tokens.fontWeightBlack,
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -88,6 +91,7 @@ const styles = StyleSheet.create({
     fontSize: tokens.fontSize2xl,
     lineHeight: tokens.lineHeightLg,
     fontWeight: tokens.fontWeightBlack,
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -185,11 +189,13 @@ const styles = StyleSheet.create({
     fontSize: tokens.fontSize4xl,
     lineHeight: tokens.lineHeight3xl,
     fontWeight: tokens.fontWeightBlack,
+    fontFamily: FONTS.pixel,
   },
   title: {
     color: colors.primary,
     fontSize: tokens.fontSizeXl,
     fontWeight: tokens.fontWeightBlack,
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.md,
     textTransform: 'uppercase',
@@ -204,6 +210,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: tokens.fontSizeMd,
     fontWeight: tokens.fontWeightBold,
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.lg,
     lineHeight: tokens.lineHeightMd,
@@ -253,6 +260,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: tokens.fontSizeSm,
     fontWeight: tokens.fontWeightBlack,
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   primaryButton: {
