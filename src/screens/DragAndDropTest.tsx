@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Dimensions, Image, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -10,16 +10,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   Draggable,
   Droppable,
   DropProvider,
 } from 'react-native-reanimated-dnd';
-import { radius } from '../theme';
+import { colors, elevation, radius, spacing, tokens } from '../theme';
 
-const { height, width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
+const animationDuration = 9000;
+
 const applecoreImage = require('../../assets/applecore.png');
 const ketchupImage = require('../../assets/kethup.png');
 const milkImage = require('../../assets/Mjolk.png');
@@ -28,35 +29,30 @@ const paperBagImage = require('../../assets/papperspase.png');
 const glassBottleImage = require('../../assets/glasflaska.png');
 const jamJarImage = require('../../assets/syltburk.png');
 
-const ANIMATION_DURATION = 9000;
-
 const categories = [
-  { name: 'food', background: '#FFD6E0', emoji: '🍌' },
-  { name: 'plastic', background: '#CDEBFF', emoji: '🍼' },
-  { name: 'paper', background: '#D9FFD6', emoji: '📰' },
-  { name: 'glass', background: '#FFF4C7', emoji: '🍶' },
+  { name: 'food', background: colors.error },
+  { name: 'plastic', background: tokens.cityPrimary },
+  { name: 'paper', background: colors.success },
+  { name: 'glass', background: colors.warning },
 ];
 
 const draggableData = [
-  { id: '1', name: 'banana peel', icon: '🍌', category: 'food' },
+  { id: '1', name: 'banana peel', icon: '?', category: 'food' },
   { id: '2', name: 'apple core', image: applecoreImage, category: 'food' },
-  { id: '3', name: 'fish bone', icon: '🐟', category: 'food' },
-  { id: '4', name: 'pizza slice', icon: '🍕', category: 'food' },
-  { id: '5', name: 'moldy bread', icon: '🥖', category: 'food' },
-
-  { id: '6', name: 'plastic bottle', icon: '🍼', category: 'plastic' },
-  { id: '7', name: 'chips bag', icon: '🍿', category: 'plastic' },
+  { id: '3', name: 'fish bone', icon: '?', category: 'food' },
+  { id: '4', name: 'pizza slice', icon: '?', category: 'food' },
+  { id: '5', name: 'moldy bread', icon: '?', category: 'food' },
+  { id: '6', name: 'plastic bottle', icon: '?', category: 'plastic' },
+  { id: '7', name: 'chips bag', icon: '?', category: 'plastic' },
   { id: '8', name: 'plastic bag', image: plasticBagImage, category: 'plastic' },
   { id: '9', name: 'ketchup bottle', image: ketchupImage, category: 'plastic' },
-  { id: '10', name: 'toothpaste tube', icon: '🪥', category: 'plastic' },
-  { id: '11', name: 'washing liquid bottle', icon: '🧼', category: 'plastic' },
-
-  { id: '12', name: 'newspaper', icon: '🗞️', category: 'paper' },
+  { id: '10', name: 'toothpaste tube', icon: '?', category: 'plastic' },
+  { id: '11', name: 'washing liquid bottle', icon: '?', category: 'plastic' },
+  { id: '12', name: 'newspaper', icon: '?', category: 'paper' },
   { id: '13', name: 'milk package', image: milkImage, category: 'paper' },
   { id: '14', name: 'paper bag', image: paperBagImage, category: 'paper' },
-  { id: '15', name: 'egg carton', icon: '🥚', category: 'paper' },
-  { id: '16', name: 'cereal box', icon: '🥣', category: 'paper' },
-
+  { id: '15', name: 'egg carton', icon: '?', category: 'paper' },
+  { id: '16', name: 'cereal box', icon: '?', category: 'paper' },
   {
     id: '17',
     name: 'glass bottle',
@@ -64,49 +60,22 @@ const draggableData = [
     category: 'glass',
   },
   { id: '18', name: 'jam jar', image: jamJarImage, category: 'glass' },
-  { id: '19', name: 'perfume bottle', icon: '🪻', category: 'glass' },
-  { id: '20', name: 'medicine bottle', icon: '💊', category: 'glass' },
+  { id: '19', name: 'perfume bottle', icon: '?', category: 'glass' },
+  { id: '20', name: 'medicine bottle', icon: '?', category: 'glass' },
 ];
 
-// =====================
-// Animated Item
-// =====================
-function AnimatedItem({ item, onMissed, onDrop }: any) {
+type Item = (typeof draggableData)[number];
+
+function AnimatedItem({
+  item,
+  onMissed,
+}: {
+  item: Item;
+  onMissed: () => void;
+}) {
   const progress = useSharedValue(0);
   const missedRef = useRef(false);
   const swayAmplitude = useRef(12 + Math.random() * 10).current;
-
-  const handleDragStart = () => {
-    runOnUI(() => {
-      'worklet';
-      cancelAnimation(progress);
-    })();
-  };
-
-  const handleDragEnd = () => {
-    const currentProgress = progress.value;
-    const remainingDuration = Math.max(
-      200,
-      (1 - currentProgress) * ANIMATION_DURATION,
-    );
-
-    runOnUI(() => {
-      'worklet';
-      progress.value = withTiming(
-        1,
-        {
-          duration: remainingDuration,
-          easing: Easing.out(Easing.quad),
-        },
-        (finished) => {
-          if (finished && !missedRef.current) {
-            runOnJS(onMissed)();
-            missedRef.current = true;
-          }
-        },
-      );
-    })();
-  };
 
   useEffect(() => {
     missedRef.current = false;
@@ -115,10 +84,10 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
     progress.value = withTiming(
       1,
       {
-        duration: ANIMATION_DURATION,
+        duration: animationDuration,
         easing: Easing.out(Easing.quad),
       },
-      (finished) => {
+      (finished?: boolean) => {
         if (finished && !missedRef.current) {
           runOnJS(onMissed)();
           missedRef.current = true;
@@ -129,19 +98,46 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
     return () => {
       missedRef.current = true;
     };
-  }, [item.id]);
+  }, [item.id, onMissed, progress]);
+
+  const handleDragStart = () => {
+    runOnUI(() => {
+      'worklet';
+      cancelAnimation(progress);
+    })();
+  };
+
+  const handleDragEnd = () => {
+    const remainingDuration = Math.max(
+      200,
+      (1 - progress.value) * animationDuration,
+    );
+
+    runOnUI(() => {
+      'worklet';
+      progress.value = withTiming(
+        1,
+        {
+          duration: remainingDuration,
+          easing: Easing.out(Easing.quad),
+        },
+        (finished?: boolean) => {
+          if (finished && !missedRef.current) {
+            runOnJS(onMissed)();
+            missedRef.current = true;
+          }
+        },
+      );
+    })();
+  };
 
   const animatedStyle = useAnimatedStyle(() => {
     const x = Math.sin(progress.value * Math.PI * 2) * swayAmplitude;
 
-    const START_Y = -150;
-    const MID_Y = height * 0.3;
-    const BOTTOM_THRESHOLD = height * 0.68;
-
     const y = interpolate(
       progress.value,
       [0, 0.5, 1],
-      [START_Y, MID_Y, BOTTOM_THRESHOLD],
+      [-150, height * 0.3, height * 0.68],
     );
 
     const wobble = Math.sin(progress.value * Math.PI * 2) * 5;
@@ -174,9 +170,6 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
   );
 }
 
-// =====================
-// MAIN SCREEN
-// =====================
 export default function DragAndDropTest() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [message, setMessage] = useState('');
@@ -189,18 +182,18 @@ export default function DragAndDropTest() {
     [currentIndex],
   );
 
-  const handleDrop = (category: string, item: any) => {
+  const handleDrop = (category: string, item: Item) => {
     setIsDropped(true);
 
     if (category === item.category) {
-      setScore((s) => s + 1);
-      setMessage('✅ Correct!');
+      setScore((value) => value + 1);
+      setMessage('Correct!');
     } else {
-      setMessage('❌ Wrong!');
+      setMessage('Wrong!');
     }
 
     setTimeout(() => {
-      setCurrentIndex((i) => i + 1);
+      setCurrentIndex((value) => value + 1);
       setMessage('');
       setMissed(false);
       setIsDropped(false);
@@ -209,108 +202,102 @@ export default function DragAndDropTest() {
 
   const handleMissed = () => {
     setMissed(true);
-    setMessage('❌ Too slow!');
+    setMessage('Too slow!');
 
     setTimeout(() => {
-      setCurrentIndex((i) => i + 1);
+      setCurrentIndex((value) => value + 1);
       setMessage('');
       setMissed(false);
     }, 1000);
   };
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.root}>
       <DropProvider>
         <View style={styles.container}>
           <Text style={styles.score}>Score: {score}</Text>
           {message ? <Text style={styles.message}>{message}</Text> : null}
 
-          {/* ITEM */}
-          {currentItem && !missed && !isDropped && (
-            <AnimatedItem
-              item={currentItem}
-              onDrop={handleDrop}
-              onMissed={handleMissed}
-            />
-          )}
-
-          {/* DROP ZONES */}
           <View style={styles.row}>
-            {categories.map((c) => (
+            {categories.map((category) => (
               <Droppable
-                key={`${c.name}-${currentIndex}`}
-                onDrop={(data) => handleDrop(c.name, data)}
+                key={`${category.name}-${currentIndex}`}
+                onDrop={(data: Item) => handleDrop(category.name, data)}
               >
-                <View style={[styles.zone, { backgroundColor: c.background }]}>
-                  <Text>{c.name.toUpperCase()}</Text>
+                <View
+                  style={[
+                    styles.zone,
+                    { backgroundColor: category.background },
+                  ]}
+                >
+                  <Text>{category.name.toUpperCase()}</Text>
                 </View>
               </Droppable>
             ))}
           </View>
+
+          {currentItem && !missed && !isDropped ? (
+            <AnimatedItem item={currentItem} onMissed={handleMissed} />
+          ) : null}
         </View>
       </DropProvider>
     </GestureHandlerRootView>
   );
 }
 
-// =====================
-// STYLES
-// =====================
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: spacing.xl + spacing.md,
     alignItems: 'center',
-    justifyContent: 'space-between', // 👈 viktig
+    justifyContent: 'space-between',
   },
-
-  title: { fontSize: 26, fontWeight: '700' },
-  score: { fontSize: 18, marginBottom: 10 },
-  message: { fontSize: 18, marginVertical: 10 },
-
+  score: {
+    fontSize: tokens.fontSizeMd,
+    marginBottom: spacing.sm,
+  },
+  message: {
+    fontSize: tokens.fontSizeMd,
+    marginVertical: spacing.sm,
+  },
   row: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
     width: '100%',
-    paddingHorizontal: 10,
-    marginBottom: 30,
-
-    zIndex: 5,
-    elevation: 5,
+    paddingHorizontal: spacing.sm,
+    marginBottom: spacing.lg,
+    elevation: elevation.md,
   },
-
   zone: {
     flex: 1,
     height: 90,
     borderRadius: radius.md,
-    padding: 10,
+    padding: spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   wrapper: {
     position: 'absolute',
     width: '100%',
     height: '100%',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    zIndex: 999,
   },
-
   card: {
     width: 50,
     height: 50,
-    borderRadius: 20,
+    borderRadius: radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-
-    backgroundColor: 'white',
-
-    zIndex: 1000,
-    elevation: 25,
+    backgroundColor: colors.textPrimary,
+    elevation: elevation.lg,
   },
-
-  iconText: { fontSize: 36 },
+  iconText: {
+    fontSize: tokens.fontSize4xl,
+  },
   assetImage: {
     width: 40,
     height: 40,

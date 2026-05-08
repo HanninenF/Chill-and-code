@@ -17,7 +17,8 @@ import {
 } from 'react-native';
 import LevelButton from '../components/ui/LevelButton';
 import type { RootStackParamList } from '../navigation/types';
-import { colors, spacing, tokens } from '../theme';
+import { colors, tokens } from '../theme';
+import styles from '../styles/StartScreen.styles';
 
 type Level = {
   id: 'park' | 'beach' | 'city';
@@ -42,31 +43,28 @@ type StartScreenNavigationProp = NativeStackNavigationProp<
   'Start'
 >;
 
+const levels: Level[] = [
+  {
+    id: 'park',
+    name: copy.levels.park,
+    backgroundStyle: { backgroundColor: colors.success },
+  },
+  {
+    id: 'beach',
+    name: copy.levels.beach,
+    backgroundStyle: { backgroundColor: tokens.beachPrimary },
+  },
+  {
+    id: 'city',
+    name: copy.levels.city,
+    backgroundStyle: { backgroundColor: tokens.cityPrimary },
+  },
+];
+
 export default function StartScreen() {
   const navigation = useNavigation<StartScreenNavigationProp>();
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
-
-  const levels: Level[] = useMemo(
-    () => [
-      {
-        id: 'park',
-        name: copy.levels.park,
-        backgroundStyle: styles.parkBackground,
-      },
-      {
-        id: 'beach',
-        name: copy.levels.beach,
-        backgroundStyle: styles.beachBackground,
-      },
-      {
-        id: 'city',
-        name: copy.levels.city,
-        backgroundStyle: styles.cityBackground,
-      },
-    ],
-    [],
-  );
 
   const dynamicStyles = useMemo(
     () =>
@@ -79,11 +77,11 @@ export default function StartScreen() {
   );
 
   const handleStartPress = (): void => {
-    console.log('Start game');
+    console.warn('Start game');
   };
 
   const handleInfoPress = (): void => {
-    console.log('Info pressed');
+    console.warn('Info pressed');
   };
 
   const handleSettingsPress = (): void => {
@@ -168,97 +166,3 @@ export default function StartScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  slide: {
-    flex: 1,
-    height: '100%',
-  },
-  cityBackground: {
-    backgroundColor: tokens.cityPrimary,
-  },
-  beachBackground: {
-    backgroundColor: tokens.beachPrimary,
-  },
-  parkBackground: {
-    backgroundColor: colors.success,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-    paddingVertical: spacing.sm,
-  },
-  iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  highScoreContainer: {
-    alignItems: 'center',
-  },
-  highScoreLabel: {
-    color: colors.textPrimary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-  highScoreValue: {
-    color: colors.textPrimary,
-    fontSize: 28,
-    fontWeight: '700',
-    marginTop: spacing.xs,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 72,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: 4,
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 28,
-    gap: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
-  activeDot: {
-    backgroundColor: colors.textPrimary,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  bottomContainer: {
-    paddingBottom: spacing.xs,
-  },
-  startButton: {
-    marginHorizontal: spacing.lg,
-  },
-});
