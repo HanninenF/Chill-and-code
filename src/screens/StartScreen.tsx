@@ -1,4 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useMemo, useState } from 'react';
 import {
   FlatList,
@@ -13,8 +15,9 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
-import { colors, spacing, tokens } from '../theme';
 import LevelButton from '../components/ui/LevelButton';
+import type { RootStackParamList } from '../navigation/types';
+import { colors, spacing, tokens } from '../theme';
 
 type Level = {
   id: 'park' | 'beach' | 'city';
@@ -34,7 +37,13 @@ const copy = {
   },
 };
 
-const StartScreen = () => {
+type StartScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Start'
+>;
+
+export default function StartScreen() {
+  const navigation = useNavigation<StartScreenNavigationProp>();
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -78,7 +87,7 @@ const StartScreen = () => {
   };
 
   const handleSettingsPress = (): void => {
-    console.log('Settings pressed');
+    navigation.navigate('Settings');
   };
 
   const handleMomentumEnd = (
@@ -158,7 +167,7 @@ const StartScreen = () => {
       </SafeAreaView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -253,5 +262,3 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
   },
 });
-
-export default StartScreen;
