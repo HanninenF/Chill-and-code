@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PrimaryButton from '../components/ui/PrimaryButton';
+import { infoSections } from './infoContent';
 import {
   borderWidth,
   colors,
@@ -20,67 +21,9 @@ type InfoScreenNavigationProp = NativeStackNavigationProp<
   'Info'
 >;
 
-type Section = {
-  title: string;
-  text: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  list?: string[];
-  listTitle?: string;
-};
-
-const sections: Section[] = [
-  {
-    title: 'OM SPELET',
-    text: 'Skräpjakten är ett spel för barn om återvinning. Här lär du dig varför vi sorterar och vad som händer med olika material.',
-    icon: 'game-controller-outline',
-  },
-  {
-    title: 'VARFÖR ÅTERVINNER VI?',
-    text: 'När vi återvinner kan material användas igen i stället för att ta nya råvaror från naturen. Det sparar energi och gör att mindre skräp hamnar i naturen.',
-    icon: 'leaf-outline',
-    listTitle: 'BRA ATT VETA',
-    list: [
-      'Papper kan bli nya tidningar och kartonger',
-      'Glas kan återvinnas många gånger utan att bli sämre',
-    ],
-  },
-  {
-    title: 'HUR SORTERAR MAN?',
-    text: 'I Sverige sorterar vi olika material var för sig så att de kan återvinnas på rätt sätt.',
-    icon: 'trash-outline',
-    listTitle: 'EXEMPEL',
-    list: [
-      'Bananskal → matavfall (kan bli biogas eller jord)',
-      'Plastflaska → plast (kan bli ny plast)',
-      'Tidning → papper (kan bli nya pappersprodukter)',
-      'Glasburk → glas (kan smältas om och användas igen)',
-    ],
-  },
-  {
-    title: 'HJÄLP DJUREN',
-    text: 'Plast kan ligga kvar i naturen väldigt länge. Djur kan fastna i plast eller tro att det är mat, och då blir de sjuka.',
-    icon: 'paw-outline',
-    listTitle: 'VARFÖR DET SPELAR ROLL',
-    list: [
-      'Rent vatten och mark gör djur friskare',
-      'Mindre skräp betyder tryggare hem för djuren',
-    ],
-  },
-  {
-    title: 'KONTAKT',
-    text: 'Har du frågor eller idéer? Skriv till oss på kontakt@skrapjakten.se.',
-    icon: 'mail-outline',
-  },
-  {
-    title: 'VERSION',
-    text: 'Version 1.0',
-    icon: 'information-circle-outline',
-  },
-];
-
 const copy = {
   title: 'INFORMATION',
-  sections,
+  sections: infoSections,
 };
 
 export default function InfoScreen() {
@@ -303,11 +246,11 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   listDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: spacing.sm,
+    height: spacing.sm,
+    borderRadius: radius.sm,
     backgroundColor: colors.primary,
-    marginTop: 8,
+    marginTop: spacing.sm,
   },
   listText: {
     color: colors.textSecondary,
