@@ -105,21 +105,22 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.header}>
-          <PrimaryButton
-            label=""
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-            contentStyle={styles.backButtonContent}
-            labelStyle={styles.backButtonLabel}
-            leftIcon={
-              <Ionicons
-                name="chevron-back"
-                size={18}
-                color={colors.primary}
-              />
-            }
-            accessibilityLabel="Tillbaka"
-          />
+          <View style={styles.backButtonWrapper}>
+            <PrimaryButton
+              label=""
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+              labelStyle={styles.backButtonLabel}
+              accessibilityLabel="Tillbaka"
+            />
+            <Ionicons
+              name="chevron-back"
+              size={18}
+              color={colors.primary}
+              style={styles.backButtonIcon}
+              pointerEvents="none"
+            />
+          </View>
           <Text
             style={styles.title}
             numberOfLines={1}
@@ -232,6 +233,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.lg,
   },
+  backButtonWrapper: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   backButton: {
     width: 36,
     height: 36,
@@ -259,6 +266,9 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.fontSize.sm,
     letterSpacing: 1,
+  },
+  backButtonIcon: {
+    position: 'absolute',
   },
   headerSpacer: {
     width: 40,
