@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, tokens } from '../theme';
+import { FONTS } from '../theme/fonts';
 
 const ONBOARDING_KEY = 'onboardingCompleted';
 
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 36,
     lineHeight: 36,
-    fontWeight: '300',
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   illustration: {
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     color: colors.error,
     fontSize: 48,
     lineHeight: 52,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 34,
     lineHeight: 34,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -311,12 +312,12 @@ const styles = StyleSheet.create({
     color: colors.shadowDark,
     fontSize: 38,
     lineHeight: 38,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
   },
   title: {
     color: colors.primary,
     fontSize: 34,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.md,
     textTransform: 'uppercase',
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
   text: {
     color: colors.textPrimary,
     fontSize: 23,
-    fontWeight: '700',
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.xl,
     lineHeight: 34,
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     color: colors.textPrimary,
     fontSize: 16,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   nextButton: {
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
   nextButtonText: {
     color: colors.textDark,
     fontSize: 22,
-    fontWeight: '900',
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
 });
