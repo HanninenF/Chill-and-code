@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import OnboardingModal from './src/components/OnboardingModal';
 import { useOnboarding } from './src/hooks/useOnboarding';
+import InfoScreen from './src/screens/InfoScreen';
 import type { RootStackParamList } from './src/navigation/types';
 import SettingsScreen from './src/screens/SettingsScreen';
 import StartScreen from './src/screens/StartScreen';
@@ -34,6 +35,11 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Start" component={StartScreen} />
+          <Stack.Screen
+            name="Info"
+            component={InfoScreen}
+            options={{ animation: 'slide_from_left' }}
+          />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>

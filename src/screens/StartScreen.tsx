@@ -81,7 +81,7 @@ export default function StartScreen() {
   };
 
   const handleInfoPress = (): void => {
-    console.warn('Info pressed');
+    navigation.navigate('Info');
   };
 
   const handleSettingsPress = (): void => {
