@@ -13,6 +13,7 @@ import {
   typography,
   zIndex,
 } from '../theme';
+import { FONTS } from '../theme/fonts';
 import PrimaryButton from './ui/PrimaryButton';
 
 type OnboardingModalProps = {
@@ -201,7 +202,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: typography.fontSize['3xl'],
     lineHeight: typography.lineHeight['2xl'],
-    fontWeight: typography.fontWeight.light,
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   illustration: {
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
     color: colors.error,
     fontSize: typography.fontSize['5xl'],
     lineHeight: typography.lineHeight['5xl'],
-    fontWeight: typography.fontWeight.black,
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -231,6 +232,7 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize['2xl'],
     lineHeight: typography.lineHeight.lg,
     fontWeight: typography.fontWeight.black,
+    fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -328,11 +330,13 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize['4xl'],
     lineHeight: typography.lineHeight['3xl'],
     fontWeight: typography.fontWeight.black,
+    fontFamily: FONTS.pixel,
   },
   title: {
     color: colors.primary,
     fontSize: typography.fontSize.xl,
     fontWeight: typography.fontWeight.black,
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.md,
     textTransform: 'uppercase',
@@ -347,6 +351,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.bold,
+    fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.lg,
     lineHeight: typography.lineHeight.md,
@@ -398,9 +403,31 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.black,
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   primaryButton: {
     flex: 1,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    borderWidth: 3,
+    borderColor: colors.primaryDark,
+    alignItems: 'center',
+    shadowColor: colors.shadowDark,
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    elevation: 6,
+  },
+  nextButtonText: {
+    color: colors.textDark,
+    fontSize: 22,
+    fontFamily: FONTS.pixel,
+    textTransform: 'uppercase',
   },
 });
