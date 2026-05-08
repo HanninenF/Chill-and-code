@@ -24,11 +24,55 @@ export const tokens = {
   radiusMd: 12,
   radiusLg: 18,
 
+  borderWidthSm: 2,
+  borderWidthMd: 3,
+  borderWidthLg: 4,
+
   spaceXs: 4,
   spaceSm: 8,
   spaceMd: 16,
   spaceLg: 24,
   spaceXl: 32,
+
+  fontSizeSm: 16,
+  fontSizeMd: 19,
+  fontSizeLg: 22,
+  fontSizeXl: 30,
+  fontSize2xl: 34,
+  fontSize3xl: 36,
+  fontSize4xl: 38,
+  fontSize5xl: 48,
+
+  lineHeightMd: 28,
+  lineHeightLg: 34,
+  lineHeight2xl: 36,
+  lineHeight3xl: 38,
+  lineHeight5xl: 52,
+
+  fontWeightLight: '300',
+  fontWeightBold: '700',
+  fontWeightBlack: '900',
+
+  sizeDot: 16,
+  sizeCloseButton: 36,
+  sizeButtonMinHeight: 74,
+  sizePlanet: 150,
+  sizeIllustration: 220,
+  sizeModalMaxWidth: 360,
+  sizeModalHeight: 680,
+
+  opacityShadowStrong: 0.8,
+  opacityShadowSolid: 1,
+
+  elevationMd: 6,
+  elevationLg: 8,
+
+  zIndexBase: 1,
+
+  degreeSm: '12deg',
+  degreeMd: '18deg',
+  degreeLg: '22deg',
+  degreeXl: '24deg',
 
   cityPrimary: '#3D8BFF',
   citySecondary: '#2B6FD1',
@@ -75,12 +119,74 @@ export const radius = {
   lg: tokens.radiusLg,
 } as const;
 
+export const borderWidth = {
+  sm: tokens.borderWidthSm,
+  md: tokens.borderWidthMd,
+  lg: tokens.borderWidthLg,
+} as const;
+
 export const spacing = {
   xs: tokens.spaceXs,
   sm: tokens.spaceSm,
   md: tokens.spaceMd,
   lg: tokens.spaceLg,
   xl: tokens.spaceXl,
+} as const;
+
+export const typography = {
+  fontSize: {
+    sm: tokens.fontSizeSm,
+    md: tokens.fontSizeMd,
+    lg: tokens.fontSizeLg,
+    xl: tokens.fontSizeXl,
+    '2xl': tokens.fontSize2xl,
+    '3xl': tokens.fontSize3xl,
+    '4xl': tokens.fontSize4xl,
+    '5xl': tokens.fontSize5xl,
+  },
+  lineHeight: {
+    md: tokens.lineHeightMd,
+    lg: tokens.lineHeightLg,
+    '2xl': tokens.lineHeight2xl,
+    '3xl': tokens.lineHeight3xl,
+    '5xl': tokens.lineHeight5xl,
+  },
+  fontWeight: {
+    light: tokens.fontWeightLight,
+    bold: tokens.fontWeightBold,
+    black: tokens.fontWeightBlack,
+  },
+} as const;
+
+export const sizes = {
+  dot: tokens.sizeDot,
+  closeButton: tokens.sizeCloseButton,
+  buttonMinHeight: tokens.sizeButtonMinHeight,
+  planet: tokens.sizePlanet,
+  illustration: tokens.sizeIllustration,
+  modalMaxWidth: tokens.sizeModalMaxWidth,
+  modalHeight: tokens.sizeModalHeight,
+} as const;
+
+export const opacity = {
+  shadowStrong: tokens.opacityShadowStrong,
+  shadowSolid: tokens.opacityShadowSolid,
+} as const;
+
+export const elevation = {
+  md: tokens.elevationMd,
+  lg: tokens.elevationLg,
+} as const;
+
+export const zIndex = {
+  base: tokens.zIndexBase,
+} as const;
+
+export const degree = {
+  sm: tokens.degreeSm,
+  md: tokens.degreeMd,
+  lg: tokens.degreeLg,
+  xl: tokens.degreeXl,
 } as const;
 
 export const cityTheme = {
@@ -111,7 +217,14 @@ export const theme = {
   tokens,
   colors,
   radius,
+  borderWidth,
   spacing,
+  typography,
+  sizes,
+  opacity,
+  elevation,
+  zIndex,
+  degree,
   levels: {
     city: cityTheme,
     beach: beachTheme,

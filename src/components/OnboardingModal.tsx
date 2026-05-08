@@ -1,14 +1,25 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors, radius, spacing, tokens } from '../theme';
+import {
+  borderWidth,
+  colors,
+  degree,
+  elevation,
+  opacity,
+  radius,
+  sizes,
+  spacing,
+  tokens,
+  typography,
+  zIndex,
+} from '../theme';
 import { FONTS } from '../theme/fonts';
-
-const ONBOARDING_KEY = 'onboardingCompleted';
+import PrimaryButton from './ui/PrimaryButton';
 
 type OnboardingModalProps = {
   visible: boolean;
   onClose: () => void;
+  onComplete: () => Promise<void>;
 };
 
 type Step = {
@@ -34,6 +45,7 @@ const steps: Step[] = [
 export default function OnboardingModal({
   visible,
   onClose,
+  onComplete,
 }: OnboardingModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -60,8 +72,7 @@ export default function OnboardingModal({
 
   const handleStartGame = async () => {
     try {
-      await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
-      onClose();
+      await onComplete();
     } catch (error) {
       console.log('Kunde inte spara onboarding:', error);
     }
@@ -128,15 +139,19 @@ export default function OnboardingModal({
             )}
 
             {!isLastStep && (
-              <Pressable style={styles.nextButton} onPress={handleNext}>
-                <Text style={styles.nextButtonText}>{primaryButtonLabel}</Text>
-              </Pressable>
+              <PrimaryButton
+                label={primaryButtonLabel}
+                style={styles.primaryButton}
+                onPress={handleNext}
+              />
             )}
 
             {isLastStep && (
-              <Pressable style={styles.nextButton} onPress={handleStartGame}>
-                <Text style={styles.nextButtonText}>{primaryButtonLabel}</Text>
-              </Pressable>
+              <PrimaryButton
+                label={primaryButtonLabel}
+                style={styles.primaryButton}
+                onPress={handleStartGame}
+              />
             )}
           </View>
         </View>
@@ -155,53 +170,53 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     width: '100%',
-    maxWidth: 360,
-    minHeight: 600,
+    maxWidth: sizes.modalMaxWidth,
+    height: sizes.modalHeight,
+    maxHeight: '92%',
     backgroundColor: colors.bgDark,
-    borderWidth: 3,
+    borderWidth: borderWidth.md,
     borderColor: colors.surfaceBorder,
     borderRadius: radius.lg,
-    paddingVertical: spacing.xl,
+    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
     shadowColor: colors.shadowDark,
-    shadowOpacity: 0.8,
+    shadowOpacity: opacity.shadowStrong,
     shadowRadius: 0,
     shadowOffset: {
       width: 0,
       height: 6,
     },
-    elevation: 8,
+    elevation: elevation.lg,
   },
   closeButton: {
     position: 'absolute',
     top: spacing.lg,
     right: spacing.lg,
-    width: 36,
-    height: 36,
+    width: sizes.closeButton,
+    height: sizes.closeButton,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: 1,
+    zIndex: zIndex.base,
   },
   closeButtonText: {
-    color: colors.textSecondary,
-    fontSize: 36,
-    lineHeight: 36,
+    color: colors.textSecondary,fontSize: typography.fontSize['3xl'],
+    lineHeight: typography.lineHeight['2xl'],
     fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   illustration: {
-    height: 270,
+    height: sizes.illustration,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.md,
-    marginBottom: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
   heart: {
     position: 'absolute',
     top: spacing.sm,
     color: colors.error,
-    fontSize: 48,
-    lineHeight: 52,
+   fontSize: typography.fontSize['5xl'],
+    lineHeight: typography.lineHeight['5xl'],
     fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
@@ -213,8 +228,9 @@ const styles = StyleSheet.create({
   star: {
     position: 'absolute',
     color: colors.primary,
-    fontSize: 34,
-    lineHeight: 34,
+    fontSize: typography.fontSize['2xl'],
+    lineHeight: typography.lineHeight.lg,
+    fontWeight: typography.fontWeight.black,
     fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
@@ -224,29 +240,29 @@ const styles = StyleSheet.create({
     textShadowRadius: 0,
   },
   starLeftTop: {
-    top: 88,
+    top: 74,
     left: 58,
   },
   starLeftBottom: {
-    bottom: 42,
+    bottom: 30,
     left: 74,
   },
   starRightTop: {
-    top: 92,
+    top: 78,
     right: 62,
   },
   starRightBottom: {
-    bottom: 70,
+    bottom: 54,
     right: 72,
   },
   planet: {
-    width: 170,
-    height: 170,
-    marginTop: 38,
+    width: sizes.planet,
+    height: sizes.planet,
+    marginTop: 30,
     overflow: 'hidden',
-    borderRadius: 85,
+    borderRadius: sizes.planet / 2,
     backgroundColor: tokens.cityButton,
-    borderWidth: 4,
+    borderWidth: borderWidth.lg,
     borderColor: colors.shadowDark,
     alignItems: 'center',
     justifyContent: 'center',
@@ -255,68 +271,70 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: colors.success,
     borderColor: colors.shadowDark,
-    borderWidth: 2,
+    borderWidth: borderWidth.sm,
   },
   landTopLeft: {
-    top: 20,
-    left: 18,
-    width: 58,
-    height: 44,
+    top: 18,
+    left: 16,
+    width: 50,
+    height: 38,
     borderRadius: 18,
-    transform: [{ rotate: '18deg' }],
+    transform: [{ rotate: degree.md }],
   },
   landTopRight: {
-    top: 38,
-    right: 18,
-    width: 54,
-    height: 50,
+    top: 34,
+    right: 16,
+    width: 48,
+    height: 44,
     borderRadius: 18,
-    transform: [{ rotate: '-24deg' }],
+    transform: [{ rotate: `-${degree.xl}` }],
   },
   landBottomLeft: {
-    bottom: 20,
-    left: 24,
-    width: 62,
-    height: 42,
+    bottom: 18,
+    left: 20,
+    width: 54,
+    height: 38,
     borderRadius: 16,
-    transform: [{ rotate: '22deg' }],
+    transform: [{ rotate: degree.lg }],
   },
   landBottomRight: {
-    right: 24,
-    bottom: 28,
-    width: 52,
-    height: 62,
+    right: 20,
+    bottom: 24,
+    width: 46,
+    height: 54,
     borderRadius: 18,
-    transform: [{ rotate: '12deg' }],
+    transform: [{ rotate: degree.sm }],
   },
   eyeLeft: {
     position: 'absolute',
-    top: 86,
-    left: 58,
-    width: 14,
-    height: 20,
-    borderRadius: 7,
+    top: 76,
+    left: 51,
+    width: 12,
+    height: 18,
+    borderRadius: 6,
     backgroundColor: colors.shadowDark,
   },
   eyeRight: {
     position: 'absolute',
-    top: 86,
-    right: 58,
-    width: 14,
-    height: 20,
-    borderRadius: 7,
+    top: 76,
+    right: 51,
+    width: 12,
+    height: 18,
+    borderRadius: 6,
     backgroundColor: colors.shadowDark,
   },
   smile: {
-    marginTop: 54,
+    marginTop: 48,
     color: colors.shadowDark,
-    fontSize: 38,
-    lineHeight: 38,
+    fontSize: typography.fontSize['4xl'],
+    lineHeight: typography.lineHeight['3xl'],
+    fontWeight: typography.fontWeight.black,
     fontFamily: FONTS.pixel,
   },
   title: {
     color: colors.primary,
-    fontSize: 34,
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.black,
     fontFamily: FONTS.pixel,
     textAlign: 'center',
     marginBottom: spacing.md,
@@ -330,11 +348,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.textPrimary,
-    fontSize: 23,
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.bold,
     fontFamily: FONTS.pixel,
     textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 34,
+    marginBottom: spacing.lg,
+    lineHeight: typography.lineHeight.md,
     textShadowColor: colors.shadowDark,
     textShadowOffset: {
       width: 0,
@@ -346,14 +365,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing.md,
-    marginBottom: 52,
+    marginBottom: spacing.xl,
   },
   stepDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: sizes.dot,
+    height: sizes.dot,
+    borderRadius: sizes.dot / 2,
     backgroundColor: colors.textMuted,
-    borderWidth: 2,
+    borderWidth: borderWidth.sm,
     borderColor: colors.surface,
   },
   stepDotActive: {
@@ -362,25 +381,31 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     gap: spacing.md,
+    minHeight: sizes.buttonMinHeight,
+    marginTop: 'auto',
   },
   backButton: {
     flex: 1,
+    minHeight: sizes.buttonMinHeight,
     backgroundColor: colors.surfaceLight,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.sm,
     borderRadius: radius.md,
-    borderWidth: 3,
+    borderWidth: borderWidth.md,
     borderColor: colors.surfaceBorder,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   backButtonText: {
     color: colors.textPrimary,
-    fontSize: 16,
-    fontFamily: FONTS.pixel,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.black,
+     fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
-  nextButton: {
+  primaryButton: {
     flex: 1,
     backgroundColor: colors.primary,
     paddingVertical: spacing.md,

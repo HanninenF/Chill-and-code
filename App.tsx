@@ -1,39 +1,42 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
-import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-
+import React from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import OnboardingModal from './src/components/OnboardingModal';
+import { useOnboarding } from './src/hooks/useOnboarding';
+import type { RootStackParamList } from './src/navigation/types';
+import SettingsScreen from './src/screens/SettingsScreen';
+import StartScreen from './src/screens/StartScreen';
 import { FONTS } from './src/theme/fonts';
 
-const ONBOARDING_KEY = 'onboardingCompleted';
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
     [FONTS.pixel]: require('./assets/fonts/PressStart2P.ttf'),
   });
 
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const { showOnboarding, completeOnboarding, closeOnboarding, isLoading } =
+    useOnboarding();
 
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      const completed = await AsyncStorage.getItem(ONBOARDING_KEY);
-
-      if (completed !== 'true') {
-        setShowOnboarding(true);
-      }
-    };
-
-    checkOnboarding();
-  }, []);
-
-  const resetOnboarding = async () => {
-    await AsyncStorage.removeItem(ONBOARDING_KEY);
-    setShowOnboarding(true);
-  };
+  if (isLoading) {
+    return <View style={styles.container} />;
+  }
 
   return (
     <View style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="Start" component={StartScreen} />
+          <Stack.Screen name="Settings" component={SettingsScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+
       <Text style={[styles.title, fontsLoaded && { fontFamily: FONTS.pixel }]}>
         Mitt spel
       </Text>
@@ -51,7 +54,8 @@ export default function App() {
 
       <OnboardingModal
         visible={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
+        onClose={closeOnboarding}
+        onComplete={completeOnboarding}
       />
     </View>
   );
@@ -60,26 +64,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#111',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: '700',
-  },
-  resetButton: {
-    marginTop: 20,
-    backgroundColor: '#ddd',
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-  },
-  resetButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#222',
   },
 });
 
