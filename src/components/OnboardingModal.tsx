@@ -199,7 +199,8 @@ const styles = StyleSheet.create({
     zIndex: zIndex.base,
   },
   closeButtonText: {
-    color: colors.textSecondary,fontSize: typography.fontSize['3xl'],
+    color: colors.textSecondary,
+    fontSize: typography.fontSize['3xl'],
     lineHeight: typography.lineHeight['2xl'],
     fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: spacing.sm,
     color: colors.error,
-   fontSize: typography.fontSize['5xl'],
+    fontSize: typography.fontSize['5xl'],
     lineHeight: typography.lineHeight['5xl'],
     fontFamily: FONTS.pixel,
     textShadowColor: colors.shadowDark,
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.black,
-     fontFamily: FONTS.pixel,
+    fontFamily: FONTS.pixel,
     textTransform: 'uppercase',
   },
   primaryButton: {
