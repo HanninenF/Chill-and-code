@@ -17,6 +17,7 @@ import {
   Droppable,
   DropProvider,
 } from 'react-native-reanimated-dnd';
+import { radius } from '../theme';
 
 const { height, width } = Dimensions.get('window');
 const applecoreImage = require('../../assets/applecore.png');
@@ -281,7 +282,7 @@ const styles = StyleSheet.create({
   zone: {
     flex: 1,
     height: 90,
-    borderRadius: 12,
+    borderRadius: radius.md,
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
