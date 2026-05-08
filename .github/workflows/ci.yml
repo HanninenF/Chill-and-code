@@ -26,6 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Verify required project folders
+        run: |
+          test -d src
+          test -d src/assets
+          test -d src/components
+          test -d src/hooks
+          test -d src/screens
+          test -d src/theme
+          test -d src/types
+          test -d src/utils
+
       - name: Typecheck
         run: npm run typecheck
 
