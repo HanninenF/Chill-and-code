@@ -13,6 +13,9 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../navigation/types';
 import { colors, spacing, tokens } from '../theme';
 import LevelButton from '../components/ui/LevelButton';
 
@@ -34,7 +37,13 @@ const copy = {
   },
 };
 
+type StartScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Start'
+>;
+
 const StartScreen = () => {
+  const navigation = useNavigation<StartScreenNavigationProp>();
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -78,7 +87,7 @@ const StartScreen = () => {
   };
 
   const handleSettingsPress = (): void => {
-    console.log('Settings pressed');
+    navigation.navigate('Settings');
   };
 
   const handleMomentumEnd = (
