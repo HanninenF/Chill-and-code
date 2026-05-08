@@ -1,26 +1,18 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState, type ComponentProps } from 'react';
 import {
   SafeAreaView,
-  StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PrimaryButton from '../components/ui/PrimaryButton';
-import {
-  borderWidth,
-  colors,
-  elevation,
-  opacity,
-  radius,
-  spacing,
-  typography,
-} from '../theme';
 import type { RootStackParamList } from '../navigation/types';
+import { colors } from '../theme';
+import styles from '../styles/SettingsScreen.styles';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -43,14 +35,32 @@ type SettingsScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 const copy = {
-  title: 'INSTÄLLNINGAR',
+  title: 'INSTALLNINGAR',
   sound: 'LJUD',
   music: 'MUSIK',
   vibration: 'VIBRATION',
-  language: 'SPRÅK',
-  reset: 'ÅTERSTÄLL FRAMSTEG',
+  language: 'SPRAK',
+  reset: 'ATERSTALL FRAMSTEG',
   swedish: 'Svenska',
 };
+
+const toggleRows = [
+  {
+    key: 'sound' as const,
+    label: copy.sound,
+    iconName: 'volume-high-outline' as IoniconName,
+  },
+  {
+    key: 'music' as const,
+    label: copy.music,
+    iconName: 'musical-notes-outline' as IoniconName,
+  },
+  {
+    key: 'vibration' as const,
+    label: copy.vibration,
+    iconName: 'phone-portrait-outline' as IoniconName,
+  },
+] as const;
 
 const SettingsRow = ({
   label,
@@ -60,9 +70,6 @@ const SettingsRow = ({
   rightElement,
   variant = 'default',
 }: SettingsRowProps) => {
-  const labelStyle =
-    variant === 'destructive' ? styles.rowLabelDestructive : styles.rowLabel;
-
   return (
     <TouchableOpacity
       style={styles.row}
@@ -75,8 +82,17 @@ const SettingsRow = ({
         <View style={styles.iconBadge}>
           <Ionicons name={iconName} size={22} color={iconColor} />
         </View>
-        <Text style={labelStyle}>{label}</Text>
+        <Text
+          style={
+            variant === 'destructive'
+              ? styles.rowLabelDestructive
+              : styles.rowLabel
+          }
+        >
+          {label}
+        </Text>
       </View>
+
       {rightElement ? (
         <View style={styles.rowRight}>{rightElement}</View>
       ) : null}
@@ -99,10 +115,6 @@ export default function SettingsScreen() {
     }));
   };
 
-  const handleResetPress = () => {
-    console.log('Reset progress');
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -118,82 +130,47 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-back"
               size={18}
-              color={colors.primary}
+              color="white"
               style={styles.backButtonIcon}
               pointerEvents="none"
             />
           </View>
+
           <Text style={styles.title} numberOfLines={1} ellipsizeMode="clip">
             {copy.title}
           </Text>
+
           <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.card}>
-          <SettingsRow
-            label={copy.sound}
-            iconName="volume-high-outline"
-            onPress={() => handleToggle('sound')}
-            rightElement={
-              <Switch
-                value={toggles.sound}
-                onValueChange={() => handleToggle('sound')}
-                trackColor={{
-                  false: colors.surfaceBorder,
-                  true: colors.primaryDark,
-                }}
-                thumbColor={
-                  toggles.sound ? colors.primary : colors.surfaceLight
-                }
-                ios_backgroundColor={colors.surfaceBorder}
-              />
-            }
-          />
-
-          <SettingsRow
-            label={copy.music}
-            iconName="musical-notes-outline"
-            onPress={() => handleToggle('music')}
-            rightElement={
-              <Switch
-                value={toggles.music}
-                onValueChange={() => handleToggle('music')}
-                trackColor={{
-                  false: colors.surfaceBorder,
-                  true: colors.primaryDark,
-                }}
-                thumbColor={
-                  toggles.music ? colors.primary : colors.surfaceLight
-                }
-                ios_backgroundColor={colors.surfaceBorder}
-              />
-            }
-          />
-
-          <SettingsRow
-            label={copy.vibration}
-            iconName="phone-portrait-outline"
-            onPress={() => handleToggle('vibration')}
-            rightElement={
-              <Switch
-                value={toggles.vibration}
-                onValueChange={() => handleToggle('vibration')}
-                trackColor={{
-                  false: colors.surfaceBorder,
-                  true: colors.primaryDark,
-                }}
-                thumbColor={
-                  toggles.vibration ? colors.primary : colors.surfaceLight
-                }
-                ios_backgroundColor={colors.surfaceBorder}
-              />
-            }
-          />
+          {toggleRows.map((row) => (
+            <SettingsRow
+              key={row.key}
+              label={row.label}
+              iconName={row.iconName}
+              onPress={() => handleToggle(row.key)}
+              rightElement={
+                <Switch
+                  value={toggles[row.key]}
+                  onValueChange={() => handleToggle(row.key)}
+                  trackColor={{
+                    false: colors.surfaceBorder,
+                    true: colors.primaryDark,
+                  }}
+                  thumbColor={
+                    toggles[row.key] ? colors.primary : colors.surfaceLight
+                  }
+                  ios_backgroundColor={colors.surfaceBorder}
+                />
+              }
+            />
+          ))}
 
           <SettingsRow
             label={copy.language}
             iconName="language-outline"
-            onPress={() => console.log('Select language')}
+            onPress={() => console.warn('Select language')}
             rightElement={
               <View style={styles.languageRight}>
                 <Text style={styles.languageText}>{copy.swedish}</Text>
@@ -210,7 +187,7 @@ export default function SettingsScreen() {
             label={copy.reset}
             iconName="refresh-outline"
             iconColor={colors.error}
-            onPress={handleResetPress}
+            onPress={() => console.warn('Reset progress')}
             variant="destructive"
           />
         </View>
@@ -218,150 +195,3 @@ export default function SettingsScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.bgDark,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.lg,
-  },
-  backButtonWrapper: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backButton: {
-    width: 36,
-    height: 36,
-    paddingVertical: 0,
-    paddingHorizontal: 0,
-    minHeight: 0,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceLight,
-    borderWidth: borderWidth.sm,
-    borderColor: colors.surfaceBorder,
-    shadowOpacity: 0,
-    shadowColor: 'transparent',
-    shadowRadius: 0,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    elevation: 0,
-  },
-  backButtonContent: {
-    justifyContent: 'center',
-    gap: 0,
-  },
-  backButtonLabel: {
-    color: colors.textPrimary,
-    fontSize: typography.fontSize.sm,
-    letterSpacing: 1,
-  },
-  backButtonIcon: {
-    position: 'absolute',
-  },
-  headerSpacer: {
-    width: 40,
-    height: 40,
-  },
-  title: {
-    textAlign: 'center',
-    color: colors.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.black,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    flex: 1,
-    paddingHorizontal: spacing.sm,
-    textShadowColor: colors.shadowDark,
-    textShadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    textShadowRadius: 0,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    borderWidth: borderWidth.md,
-    borderColor: colors.surfaceBorder,
-    paddingHorizontal: spacing.md,
-    shadowColor: colors.shadowDark,
-    shadowOpacity: opacity.shadowStrong,
-    shadowRadius: 0,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    elevation: elevation.md,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderBottomWidth: borderWidth.sm,
-    borderBottomColor: colors.surfaceBorder,
-  },
-  rowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    flex: 1,
-    minWidth: 0,
-  },
-  rowRight: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: spacing.sm,
-  },
-  iconBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.sm,
-    backgroundColor: colors.surfaceLight,
-    borderWidth: borderWidth.sm,
-    borderColor: colors.surfaceBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rowLabel: {
-    color: colors.textPrimary,
-    fontSize: typography.fontSize.md,
-    fontWeight: typography.fontWeight.black,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    flexShrink: 1,
-  },
-  rowLabelDestructive: {
-    color: colors.error,
-    fontSize: typography.fontSize.md,
-    fontWeight: typography.fontWeight.black,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    flexShrink: 1,
-  },
-  languageRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  languageText: {
-    color: colors.textSecondary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.bold,
-    textTransform: 'capitalize',
-  },
-});

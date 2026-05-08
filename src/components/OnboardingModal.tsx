@@ -1,19 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import {
-  borderWidth,
-  colors,
-  degree,
-  elevation,
-  opacity,
-  radius,
-  sizes,
-  spacing,
-  tokens,
-  typography,
-  zIndex,
-} from '../theme';
+import { Modal, Pressable, Text, View } from 'react-native';
 import PrimaryButton from './ui/PrimaryButton';
+import styles from '../styles/OnboardingModal.styles';
 
 type OnboardingModalProps = {
   visible: boolean;
@@ -59,13 +47,13 @@ export default function OnboardingModal({
 
   const handleNext = () => {
     if (!isLastStep) {
-      setCurrentStep((prevStep) => prevStep + 1);
+      setCurrentStep((step) => step + 1);
     }
   };
 
   const handleBack = () => {
     if (!isFirstStep) {
-      setCurrentStep((prevStep) => prevStep - 1);
+      setCurrentStep((step) => step - 1);
     }
   };
 
@@ -73,7 +61,7 @@ export default function OnboardingModal({
     try {
       await onComplete();
     } catch (error) {
-      console.log('Kunde inte spara onboarding:', error);
+      console.warn('Kunde inte spara onboarding:', error);
     }
   };
 
@@ -114,293 +102,38 @@ export default function OnboardingModal({
             </View>
           </View>
 
-          <Text style={styles.title}>{steps[currentStep].title}</Text>
+          <View style={styles.content}>
+            <Text style={styles.title}>{steps[currentStep].title}</Text>
+            <Text style={styles.text}>{steps[currentStep].text}</Text>
 
-          <Text style={styles.text}>{steps[currentStep].text}</Text>
-
-          <View style={styles.stepIndicator}>
-            {steps.map((step, index) => (
-              <View
-                key={step.title}
-                style={[
-                  styles.stepDot,
-                  index === currentStep && styles.stepDotActive,
-                ]}
-              />
-            ))}
+            <View style={styles.stepIndicator}>
+              {steps.map((step, index) => (
+                <View
+                  key={step.title}
+                  style={[
+                    styles.stepDot,
+                    index === currentStep && styles.stepDotActive,
+                  ]}
+                />
+              ))}
+            </View>
           </View>
 
           <View style={styles.buttonContainer}>
-            {!isFirstStep && (
+            {!isFirstStep ? (
               <Pressable style={styles.backButton} onPress={handleBack}>
                 <Text style={styles.backButtonText}>Tillbaka</Text>
               </Pressable>
-            )}
+            ) : null}
 
-            {!isLastStep && (
-              <PrimaryButton
-                label={primaryButtonLabel}
-                style={styles.primaryButton}
-                onPress={handleNext}
-              />
-            )}
-
-            {isLastStep && (
-              <PrimaryButton
-                label={primaryButtonLabel}
-                style={styles.primaryButton}
-                onPress={handleStartGame}
-              />
-            )}
+            <PrimaryButton
+              label={primaryButtonLabel}
+              style={styles.primaryButton}
+              onPress={isLastStep ? handleStartGame : handleNext}
+            />
           </View>
         </View>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: tokens.colorBgOverlay,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.lg,
-  },
-  modalBox: {
-    width: '100%',
-    maxWidth: sizes.modalMaxWidth,
-    height: sizes.modalHeight,
-    maxHeight: '92%',
-    backgroundColor: colors.bgDark,
-    borderWidth: borderWidth.md,
-    borderColor: colors.surfaceBorder,
-    borderRadius: radius.lg,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    shadowColor: colors.shadowDark,
-    shadowOpacity: opacity.shadowStrong,
-    shadowRadius: 0,
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    elevation: elevation.lg,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: spacing.lg,
-    right: spacing.lg,
-    width: sizes.closeButton,
-    height: sizes.closeButton,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: zIndex.base,
-  },
-  closeButtonText: {
-    color: colors.textSecondary,
-    fontSize: typography.fontSize['3xl'],
-    lineHeight: typography.lineHeight['2xl'],
-    fontWeight: typography.fontWeight.light,
-    textTransform: 'uppercase',
-  },
-  illustration: {
-    height: sizes.illustration,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  heart: {
-    position: 'absolute',
-    top: spacing.sm,
-    color: colors.error,
-    fontSize: typography.fontSize['5xl'],
-    lineHeight: typography.lineHeight['5xl'],
-    fontWeight: typography.fontWeight.black,
-    textShadowColor: colors.shadowDark,
-    textShadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    textShadowRadius: 0,
-  },
-  star: {
-    position: 'absolute',
-    color: colors.primary,
-    fontSize: typography.fontSize['2xl'],
-    lineHeight: typography.lineHeight.lg,
-    fontWeight: typography.fontWeight.black,
-    textShadowColor: colors.shadowDark,
-    textShadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    textShadowRadius: 0,
-  },
-  starLeftTop: {
-    top: 74,
-    left: 58,
-  },
-  starLeftBottom: {
-    bottom: 30,
-    left: 74,
-  },
-  starRightTop: {
-    top: 78,
-    right: 62,
-  },
-  starRightBottom: {
-    bottom: 54,
-    right: 72,
-  },
-  planet: {
-    width: sizes.planet,
-    height: sizes.planet,
-    marginTop: 30,
-    overflow: 'hidden',
-    borderRadius: sizes.planet / 2,
-    backgroundColor: tokens.cityButton,
-    borderWidth: borderWidth.lg,
-    borderColor: colors.shadowDark,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  land: {
-    position: 'absolute',
-    backgroundColor: colors.success,
-    borderColor: colors.shadowDark,
-    borderWidth: borderWidth.sm,
-  },
-  landTopLeft: {
-    top: 18,
-    left: 16,
-    width: 50,
-    height: 38,
-    borderRadius: 18,
-    transform: [{ rotate: degree.md }],
-  },
-  landTopRight: {
-    top: 34,
-    right: 16,
-    width: 48,
-    height: 44,
-    borderRadius: 18,
-    transform: [{ rotate: `-${degree.xl}` }],
-  },
-  landBottomLeft: {
-    bottom: 18,
-    left: 20,
-    width: 54,
-    height: 38,
-    borderRadius: 16,
-    transform: [{ rotate: degree.lg }],
-  },
-  landBottomRight: {
-    right: 20,
-    bottom: 24,
-    width: 46,
-    height: 54,
-    borderRadius: 18,
-    transform: [{ rotate: degree.sm }],
-  },
-  eyeLeft: {
-    position: 'absolute',
-    top: 76,
-    left: 51,
-    width: 12,
-    height: 18,
-    borderRadius: 6,
-    backgroundColor: colors.shadowDark,
-  },
-  eyeRight: {
-    position: 'absolute',
-    top: 76,
-    right: 51,
-    width: 12,
-    height: 18,
-    borderRadius: 6,
-    backgroundColor: colors.shadowDark,
-  },
-  smile: {
-    marginTop: 48,
-    color: colors.shadowDark,
-    fontSize: typography.fontSize['4xl'],
-    lineHeight: typography.lineHeight['3xl'],
-    fontWeight: typography.fontWeight.black,
-  },
-  title: {
-    color: colors.primary,
-    fontSize: typography.fontSize.xl,
-    fontWeight: typography.fontWeight.black,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-    textTransform: 'uppercase',
-    textShadowColor: colors.shadowDark,
-    textShadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    textShadowRadius: 0,
-  },
-  text: {
-    color: colors.textPrimary,
-    fontSize: typography.fontSize.md,
-    fontWeight: typography.fontWeight.bold,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-    lineHeight: typography.lineHeight.md,
-    textShadowColor: colors.shadowDark,
-    textShadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    textShadowRadius: 0,
-  },
-  stepIndicator: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  stepDot: {
-    width: sizes.dot,
-    height: sizes.dot,
-    borderRadius: sizes.dot / 2,
-    backgroundColor: colors.textMuted,
-    borderWidth: borderWidth.sm,
-    borderColor: colors.surface,
-  },
-  stepDotActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primaryDark,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    gap: spacing.md,
-    minHeight: sizes.buttonMinHeight,
-    marginTop: 'auto',
-  },
-  backButton: {
-    flex: 1,
-    minHeight: sizes.buttonMinHeight,
-    backgroundColor: colors.surfaceLight,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.sm,
-    borderRadius: radius.md,
-    borderWidth: borderWidth.md,
-    borderColor: colors.surfaceBorder,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  backButtonText: {
-    color: colors.textPrimary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.black,
-    textTransform: 'uppercase',
-  },
-  primaryButton: {
-    flex: 1,
-  },
-});

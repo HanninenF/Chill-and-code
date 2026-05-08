@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
 import DragAndDropTest from './DragAndDropTest';
+import { StyleSheet, Text, View } from 'react-native';
+import { colors, spacing, typography } from '../theme';
 
 export function HomeScreen() {
   return (
@@ -14,21 +15,21 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: '#f7f7f2',
+    backgroundColor: colors.bgDark,
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: spacing.lg,
   },
   subtitle: {
-    color: '#4a5568',
-    fontSize: 16,
-    marginTop: 8,
+    color: colors.textSecondary,
+    fontSize: typography.fontSize.sm,
+    marginTop: spacing.sm,
     textAlign: 'center',
   },
   title: {
-    color: '#17202a',
-    fontSize: 28,
-    fontWeight: '700',
+    color: colors.primary,
+    fontSize: typography.fontSize.xl,
+    fontWeight: typography.fontWeight.bold,
     textAlign: 'center',
   },
 });
