@@ -77,7 +77,9 @@ const SettingsRow = ({
         </View>
         <Text style={labelStyle}>{label}</Text>
       </View>
-      {rightElement ? <View style={styles.rowRight}>{rightElement}</View> : null}
+      {rightElement ? (
+        <View style={styles.rowRight}>{rightElement}</View>
+      ) : null}
     </TouchableOpacity>
   );
 };
@@ -121,11 +123,7 @@ export default function SettingsScreen() {
               pointerEvents="none"
             />
           </View>
-          <Text
-            style={styles.title}
-            numberOfLines={1}
-            ellipsizeMode="clip"
-          >
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="clip">
             {copy.title}
           </Text>
           <View style={styles.headerSpacer} />
@@ -144,7 +142,9 @@ export default function SettingsScreen() {
                   false: colors.surfaceBorder,
                   true: colors.primaryDark,
                 }}
-                thumbColor={toggles.sound ? colors.primary : colors.surfaceLight}
+                thumbColor={
+                  toggles.sound ? colors.primary : colors.surfaceLight
+                }
                 ios_backgroundColor={colors.surfaceBorder}
               />
             }
@@ -162,7 +162,9 @@ export default function SettingsScreen() {
                   false: colors.surfaceBorder,
                   true: colors.primaryDark,
                 }}
-                thumbColor={toggles.music ? colors.primary : colors.surfaceLight}
+                thumbColor={
+                  toggles.music ? colors.primary : colors.surfaceLight
+                }
                 ios_backgroundColor={colors.surfaceBorder}
               />
             }
