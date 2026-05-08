@@ -79,6 +79,8 @@ const draggableData = [
   { id: '21', name: 'squirrel', image: afraidSquirrel, isSquirrel: true },
 ];
 
+const maxGameItems = 20;
+
 // Items with images only (for randomized gameplay) - excluding squirrel
 const imageItems = draggableData.filter(
   (item) => item.image && !item.isSquirrel,
@@ -98,7 +100,7 @@ const generateGameItems = () => {
   }
 
   // Fill the array
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < maxGameItems; i++) {
     if (squirrelPositions.has(i)) {
       gameItems[i] = {
         id: '21',
@@ -122,7 +124,13 @@ const generateGameItems = () => {
 // =====================
 // Squirrel Item (Pressable - 3 clicks to rescue)
 // =====================
-function SquirrelItem({ item, onRescued, onMissed, isRescued }: any) {
+function SquirrelItem({
+  item,
+  onRescued,
+  onMissed,
+  isRescued,
+  onInteract,
+}: any) {
   const progress = useSharedValue(0);
   const missedRef = useRef(false);
   const swayAmplitude = useRef(12 + Math.random() * 10).current;
@@ -131,22 +139,32 @@ function SquirrelItem({ item, onRescued, onMissed, isRescued }: any) {
 
   // Play sound when squirrel appears
   useEffect(() => {
+    let isMounted = true;
+
     const playSound = async () => {
       try {
         const sound = new Audio.Sound();
-        soundRef.current = sound;
         await sound.loadAsync(require('../assets/audio/Squirrel1.m4a'));
-        await sound.playAsync();
+        await sound.setVolumeAsync(1);
+
+        if (isMounted) {
+          soundRef.current = sound;
+          const status = await sound.playAsync();
+          console.log('Squirrel1.m4a playing:', status);
+        }
       } catch (error) {
-        console.log('Error playing sound:', error);
+        console.error('Error playing Squirrel1.m4a:', error);
       }
     };
 
     playSound();
 
     return () => {
+      isMounted = false;
       if (soundRef.current) {
-        soundRef.current.unloadAsync();
+        soundRef.current
+          .unloadAsync()
+          .catch((e: any) => console.error('Unload error:', e));
       }
     };
   }, [item.uniqueId]);
@@ -199,6 +217,7 @@ function SquirrelItem({ item, onRescued, onMissed, isRescued }: any) {
   });
 
   const handlePress = () => {
+    onInteract?.();
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
 
@@ -211,12 +230,7 @@ function SquirrelItem({ item, onRescued, onMissed, isRescued }: any) {
   return (
     <Animated.View style={[styles.wrapper, animatedStyle]}>
       <Pressable onPress={handlePress}>
-        <View
-          style={[
-            isRescued ? styles.squirrelCard : styles.card,
-            isRescued && styles.squirrelCardLarge,
-          ]}
-        >
+        <View style={[styles.squirrelCard, !isRescued && { opacity: 0.9 }]}>
           {!isRescued && (
             <Text style={[styles.clickCounter, styles.clickCounterText]}>
               {3 - clickCount}
@@ -224,7 +238,7 @@ function SquirrelItem({ item, onRescued, onMissed, isRescued }: any) {
           )}
           <Image
             source={isRescued ? squirrel : item.image}
-            style={isRescued ? styles.squirrelImage : styles.assetImage}
+            style={styles.squirrelImage}
           />
         </View>
       </Pressable>
@@ -343,19 +357,125 @@ function AnimatedItem({ item, onMissed, onDrop }: any) {
 // =====================
 export default function DragAndDropTest() {
   const [gameItems] = useState(() => generateGameItems());
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [fallingItems, setFallingItems] = useState<any[]>([]);
+  const [nextItemIndex, setNextItemIndex] = useState(0);
   const [message, setMessage] = useState('');
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
-  const [missed, setMissed] = useState(false);
-  const [isDropped, setIsDropped] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [squirrelRescued, setSquirrelRescued] = useState(false);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [rescuedIds, setRescuedIds] = useState<Set<string>>(new Set());
+  const [dropCounter, setDropCounter] = useState(0);
+  const backgroundMusicRef = useRef<any>(null);
+  const musicStartedRef = useRef(false);
+  const intervalRef = useRef<any>(null);
 
-  const currentItem = useMemo(
-    () => gameItems[currentIndex],
-    [currentIndex, gameItems],
-  );
+  // Play background music on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    const prepareBackgroundMusic = async () => {
+      try {
+        const sound = new Audio.Sound();
+        await sound.loadAsync(require('../assets/audio/PARK.m4a'));
+        await sound.setIsLoopingAsync(true);
+        await sound.setVolumeAsync(0.3);
+
+        if (isMounted) {
+          backgroundMusicRef.current = sound;
+          console.log('Background music loaded, ready to play');
+          // Try to play immediately - if it fails, will play on first interaction
+          sound
+            .playAsync()
+            .then(() => {
+              musicStartedRef.current = true;
+              console.log('Background music started');
+            })
+            .catch((error: any) => {
+              console.log(
+                'Auto-play failed (expected), will play on first interaction:',
+                error.message,
+              );
+            });
+        } else {
+          await sound.unloadAsync();
+        }
+      } catch (error) {
+        console.error('Error preparing background music:', error);
+      }
+    };
+
+    // Small delay to ensure previous audio context is cleared
+    const timer = setTimeout(() => {
+      if (isMounted) {
+        prepareBackgroundMusic();
+      }
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current
+          .stopAsync()
+          .then(() => {
+            backgroundMusicRef.current?.unloadAsync();
+          })
+          .catch((e: any) => console.error('Cleanup error:', e));
+      }
+    };
+  }, []);
+
+  // Helper function to start music on first user interaction
+  const tryPlayBackgroundMusic = async () => {
+    if (!musicStartedRef.current && backgroundMusicRef.current) {
+      try {
+        await backgroundMusicRef.current.playAsync();
+        musicStartedRef.current = true;
+        console.log('Background music started on user interaction');
+      } catch (error) {
+        console.error('Error starting background music:', error);
+      }
+    }
+  };
+
+  const playSound = async (soundFile: any, volume: number) => {
+    try {
+      const sound = new Audio.Sound();
+      await sound.loadAsync(soundFile);
+      await sound.setVolumeAsync(volume);
+      await sound.playAsync();
+    } catch (error) {
+      console.error('Error playing sound:', error);
+    }
+  };
+
+  // Spawn items continuously
+  useEffect(() => {
+    if (gameOver || !gameStarted) return;
+
+    intervalRef.current = setInterval(() => {
+      setNextItemIndex((prev) => {
+        if (prev < gameItems.length) {
+          setFallingItems((items) => [
+            ...items,
+            {
+              ...gameItems[prev],
+              fallingId: `${gameItems[prev].id}-${Date.now()}-${Math.random()}`,
+            },
+          ]);
+          return prev + 1;
+        } else {
+          clearInterval(intervalRef.current);
+          return prev;
+        }
+      });
+    }, 2500);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [gameOver, gameStarted, gameItems]);
 
   useEffect(() => {
     if (lives === 0) {
@@ -363,118 +483,198 @@ export default function DragAndDropTest() {
     }
   }, [lives]);
 
+  // Check if all items have been spawned and cleared - end of game
+  useEffect(() => {
+    if (
+      gameStarted &&
+      !gameOver &&
+      nextItemIndex >= gameItems.length &&
+      fallingItems.length === 0
+    ) {
+      setGameOver(true);
+    }
+  }, [
+    gameStarted,
+    gameOver,
+    nextItemIndex,
+    gameItems.length,
+    fallingItems.length,
+  ]);
+
+  // Try to start background music when first item spawns
+  useEffect(() => {
+    if (fallingItems.length > 0) {
+      tryPlayBackgroundMusic();
+    }
+  }, [fallingItems.length]);
+
   const handleDrop = (category: string, item: any) => {
-    setIsDropped(true);
+    tryPlayBackgroundMusic();
 
     if (category === item.category) {
       setScore((s) => s + 1);
       setMessage('✅ Correct!');
+      // Play success sound
+      playSound(require('../assets/audio/correct.m4a'), 1);
     } else {
       setLives((l) => Math.max(0, l - 1));
       setMessage('❌ Wrong!');
+      // Play failure sound
+      playSound(require('../assets/audio/failure.m4a'), 1);
+    }
+
+    // Remove item immediately
+    setFallingItems((items) =>
+      items.filter((i) => i.fallingId !== item.fallingId),
+    );
+
+    // Increment dropCounter to force Droppable refresh
+    setDropCounter((c) => c + 1);
+
+    setTimeout(() => {
+      setMessage('');
+    }, 500);
+  };
+
+  const handleMissed = (fallingId: string) => {
+    setLives((l) => Math.max(0, l - 1));
+    setMessage('❌ Too slow!');
+    // Play failure sound
+    playSound(require('../assets/audio/failure.m4a'), 1);
+
+    // Remove item immediately
+    setFallingItems((items) => items.filter((i) => i.fallingId !== fallingId));
+
+    setTimeout(() => {
+      setMessage('');
+    }, 300);
+  };
+
+  const handleRescued = async (fallingId: string) => {
+    setScore((s) => s + 1);
+    setRescuedIds((prev) => new Set([...prev, fallingId]));
+
+    // Play yay sound
+    try {
+      const sound = new Audio.Sound();
+      await sound.loadAsync(require('../assets/audio/yay.wav'));
+      await sound.setVolumeAsync(1);
+      const status = await sound.playAsync();
+      console.log('yay.wav playing:', status);
+    } catch (error) {
+      console.error('Error playing yay.wav:', error);
     }
 
     setTimeout(() => {
-      if (currentIndex < gameItems.length - 1) {
-        setCurrentIndex((i) => i + 1);
-      } else {
-        setGameOver(true);
-      }
-      setMessage('');
-      setMissed(false);
-      setIsDropped(false);
-      setSquirrelRescued(false);
-    }, 500);
+      setFallingItems((items) =>
+        items.filter((i) => i.fallingId !== fallingId),
+      );
+      setRescuedIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(fallingId);
+        return newSet;
+      });
+    }, 1500);
   };
 
-  const handleMissed = () => {
-    setMissed(true);
-    setLives((l) => Math.max(0, l - 1));
-    setMessage('❌ Too slow!');
-
-    setTimeout(() => {
-      if (currentIndex < gameItems.length - 1) {
-        setCurrentIndex((i) => i + 1);
-      } else {
-        setGameOver(true);
-      }
-      setMessage('');
-      setMissed(false);
-      setSquirrelRescued(false);
-    }, 1000);
-  };
-
-  const handleRescued = () => {
-    setSquirrelRescued(true);
-    setIsDropped(true);
-    setScore((s) => s + 1);
-    setMessage('🎉 Squirrel saved!');
-
-    setTimeout(() => {
-      if (currentIndex < gameItems.length - 1) {
-        setCurrentIndex((i) => i + 1);
-      } else {
-        setGameOver(true);
-      }
-      setMessage('');
-      setMissed(false);
-      setIsDropped(false);
-      setSquirrelRescued(false);
-    }, 500);
+  const startGame = () => {
+    setGameStarted(true);
+    setGameOver(false);
+    setScore(0);
+    setLives(3);
+    // Spawn first item immediately
+    setFallingItems([
+      {
+        ...gameItems[0],
+        fallingId: `${gameItems[0].id}-${Date.now()}-${Math.random()}`,
+      },
+    ]);
+    setNextItemIndex(1);
+    setRescuedIds(new Set());
+    setMessage('');
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <DropProvider>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.score}>Score: {score}</Text>
-            <Text style={styles.lives}>Lives: {'❤️'.repeat(lives)}</Text>
-          </View>
-          {message ? <Text style={styles.message}>{message}</Text> : null}
-
-          {gameOver ? (
-            <View style={styles.gameOverContainer}>
-              <Text style={styles.gameOverText}>Game Over!</Text>
-              <Text style={styles.finalScore}>Final Score: {score}</Text>
+      {!gameStarted ? (
+        <View style={styles.startScreenContainer}>
+          <Pressable onPress={startGame} style={styles.startButton}>
+            <Text style={styles.startButtonText}>Börja spela</Text>
+          </Pressable>
+        </View>
+      ) : gameOver ? (
+        <View style={styles.startScreenContainer}>
+          <Text style={styles.gameOverText}>Spelet är slut!</Text>
+          <Text style={styles.finalScore}>
+            Poäng: {score}/{maxGameItems}
+          </Text>
+          <Pressable onPress={startGame} style={styles.startButton}>
+            <Text style={styles.startButtonText}>Spela igen</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <DropProvider>
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Text style={styles.score}>
+                Poäng: {score}/{maxGameItems}
+              </Text>
+              <Text style={styles.lives}>Liv: {'❤️'.repeat(lives)}</Text>
             </View>
-          ) : currentItem && !missed && !isDropped ? (
-            <>
-              {currentItem.isSquirrel ? (
-                <SquirrelItem
-                  item={currentItem}
-                  onRescued={handleRescued}
-                  onMissed={handleMissed}
-                  isRescued={squirrelRescued}
-                />
-              ) : (
-                <AnimatedItem
-                  item={currentItem}
-                  onDrop={handleDrop}
-                  onMissed={handleMissed}
-                />
-              )}
-            </>
-          ) : null}
+            {message ? <Text style={styles.message}>{message}</Text> : null}
 
-          {!gameOver && (
+            <>
+              {fallingItems
+                .slice()
+                .reverse()
+                .map((item) => (
+                  <React.Fragment key={item.fallingId}>
+                    {item.isSquirrel ? (
+                      <SquirrelItem
+                        item={item}
+                        onRescued={() => handleRescued(item.fallingId)}
+                        onMissed={() => handleMissed(item.fallingId)}
+                        isRescued={rescuedIds.has(item.fallingId)}
+                        onInteract={tryPlayBackgroundMusic}
+                      />
+                    ) : (
+                      <AnimatedItem
+                        item={item}
+                        onDrop={handleDrop}
+                        onMissed={() => handleMissed(item.fallingId)}
+                      />
+                    )}
+                  </React.Fragment>
+                ))}
+            </>
+
             <View style={styles.row}>
               {categories.map((c) => (
                 <Droppable
-                  key={`${c.name}-${currentIndex}`}
-                  onDrop={(data) => handleDrop(c.name, data)}
+                  key={`${c.name}-${dropCounter}`}
+                  onDrop={(data) => {
+                    if (!gameOver) {
+                      handleDrop(c.name, data);
+                    }
+                  }}
                 >
                   <View
-                    style={[styles.zone, { backgroundColor: c.background }]}
+                    style={[
+                      styles.zone,
+                      {
+                        backgroundColor: c.background,
+                        opacity: gameOver ? 0.5 : 1,
+                      },
+                    ]}
                   >
                     <Text>{c.name.toUpperCase()}</Text>
                   </View>
                 </Droppable>
               ))}
             </View>
-          )}
-        </View>
-      </DropProvider>
+          </View>
+        </DropProvider>
+      )}
     </GestureHandlerRootView>
   );
 }
@@ -503,6 +703,14 @@ const styles = StyleSheet.create({
   lives: { fontSize: 18, fontWeight: '600' },
   message: { fontSize: 18, marginVertical: 10, fontWeight: '600' },
 
+  startScreenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    gap: 20,
+  },
+
   gameOverContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -512,6 +720,20 @@ const styles = StyleSheet.create({
 
   gameOverText: { fontSize: 48, fontWeight: '700' },
   finalScore: { fontSize: 28, fontWeight: '600' },
+
+  startButton: {
+    marginTop: 30,
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    backgroundColor: '#4CAF50',
+    borderRadius: 12,
+  },
+
+  startButtonText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'white',
+  },
 
   row: {
     flexDirection: 'row',
@@ -580,8 +802,8 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   squirrelImage: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
     resizeMode: 'contain',
   },
   clickCounter: {
