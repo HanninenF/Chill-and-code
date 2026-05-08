@@ -83,7 +83,7 @@ const StartScreen = () => {
   };
 
   const handleInfoPress = (): void => {
-    console.log('Info pressed');
+    navigation.navigate('Info');
   };
 
   const handleSettingsPress = (): void => {

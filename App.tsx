@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import OnboardingModal from './src/components/OnboardingModal';
 import { useOnboarding } from './src/hooks/useOnboarding';
+import InfoScreen from './src/screens/InfoScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import StartScreen from './src/screens/StartScreen';
 import type { RootStackParamList } from './src/navigation/types';
@@ -28,6 +29,11 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Start" component={StartScreen} />
+          <Stack.Screen
+            name="Info"
+            component={InfoScreen}
+            options={{ animation: 'slide_from_left' }}
+          />
           <Stack.Screen name="Settings" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
